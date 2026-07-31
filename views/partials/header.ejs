@@ -44,18 +44,27 @@
     .running-timer form { margin: 0; }
     .running-timer button { margin: 0; padding: .25rem .75rem; font-size: .875rem; }
     .total-time { font-size: 1.125rem; font-weight: 600; }
+    .trend { list-style: none; padding: 0; margin: 0; }
+    .trend li { display: grid; grid-template-columns: 6rem 1fr auto;
+                align-items: center; gap: .5rem; padding: .125rem 0; }
+    .trend-date { font-size: .8125rem; color: #666; }
+    .trend-bar { background: #4a7ebb; height: .75rem; border-radius: 2px; min-width: 0; }
+    .trend-value { font-size: .8125rem; }
+    header nav { display: flex; gap: 1rem; align-items: center; }
+    header nav a { font-weight: 400; }
   </style>
 </head>
 <body>
   <header>
     <a href="/">タスク管理</a>
     <% if (locals.currentUser) { %>
-      <span>
-        <%= currentUser.name %>
-        <form action="/logout" method="post" style="display:inline">
+      <nav>
+        <a href="/me">自分のページ</a>
+        <span><%= currentUser.name %></span>
+        <form action="/logout" method="post">
           <button type="submit">ログアウト</button>
         </form>
-      </span>
+      </nav>
     <% } %>
   </header>
   <% if (locals.runningTimer) { %>

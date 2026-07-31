@@ -1,0 +1,58 @@
+<%- include("partials/header", { title: "自分のページ" }) %>
+
+<h1>自分のページ</h1>
+
+<h2>担当しているタスク</h2>
+<% if (tasks.length === 0) { %>
+  <p>担当しているタスクはありません。</p>
+<% } else { %>
+  <% const today = todayInJst(); %>
+  <table>
+    <thead>
+      <tr>
+        <th>タスク</th>
+        <th>チーム</th>
+        <th>ステータス</th>
+        <th>期限</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% tasks.forEach((task) => { %>
+        <% const overdue = task.due_date && task.due_date < today && task.status !== "done"; %>
+        <tr>
+          <td>
+            <a href="/teams/<%= task.team_id %>/tasks/<%= task.id %>"><%= task.title %></a>
+          </td>
+          <td><a href="/teams/<%= task.team_id %>"><%= task.team_name %></a></td>
+          <td><%= statusLabel(task.status) %></td>
+          <td class="<%= overdue ? "overdue" : "" %>">
+            <%= formatDate(task.due_date) || "—" %>
+            <% if (overdue) { %>（期限切れ）<% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+
+<h2>直近30日の作業時間</h2>
+<p class="total-time">合計 <%= formatMinutes(totalMinutes) || "0分" %></p>
+
+<% if (maxMinutes === 0) { %>
+  <p>この30日間に記録された作業時間はありません。</p>
+<% } else { %>
+  <ul class="trend">
+    <% recentWork.forEach((day) => { %>
+      <li>
+        <span class="trend-date"><%= formatDate(day.work_date) %></span>
+        <span class="trend-bar"
+              style="width: <%= Math.round((day.minutes / maxMinutes) * 100) %>%"></span>
+        <span class="trend-value"><%= day.minutes > 0 ? formatMinutes(day.minutes) : "" %></span>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<p><a href="/teams">チーム一覧に戻る</a></p>
+
+<%- include("partials/footer") %>

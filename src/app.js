@@ -10,6 +10,7 @@ import { attachRunningTimer } from "./middleware/time-entries.js";
 import { authRouter } from "./routes/auth.js";
 import { healthRouter } from "./routes/health.js";
 import { homeRouter } from "./routes/home.js";
+import { meRouter } from "./routes/me.js";
 import { teamsRouter } from "./routes/teams.js";
 import { errorHandler, notFound } from "./middleware/errors.js";
 
@@ -44,6 +45,7 @@ export function createApp() {
 
   app.use(authRouter);
   app.use(homeRouter);
+  app.use(meRouter);
   // teamsRouter はルーター全体に requireAuth をかけるため、必ず /teams 配下に
   // マウントする。app 直下に置くと無関係な URL の 404 まで認証で横取りされる。
   app.use("/teams", teamsRouter);

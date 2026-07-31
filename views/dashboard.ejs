@@ -1,0 +1,92 @@
+<%- include("partials/header", { title: `${team.name} のダッシュボード` }) %>
+
+<h1><%= team.name %> のダッシュボード</h1>
+
+<h2>メンバーごとの状況</h2>
+<table>
+  <thead>
+    <tr>
+      <th>メンバー</th>
+      <th>担当</th>
+      <th>未着手</th>
+      <th>作業中</th>
+      <th>レビュー中</th>
+      <th>完了</th>
+      <th>今週の作業時間</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% members.forEach((member) => { %>
+      <tr>
+        <td>
+          <%= member.name %>
+          <% if (member.role === "leader") { %>（リーダー）<% } %>
+        </td>
+        <td><%= member.task_count %></td>
+        <td><%= member.todo_count %></td>
+        <td><%= member.in_progress_count %></td>
+        <td><%= member.review_count %></td>
+        <td><%= member.done_count %></td>
+        <td><%= formatMinutes(member.week_minutes) || "0分" %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<% if (unassignedCount > 0) { %>
+  <p>
+    未割り当てのタスクが <%= unassignedCount %> 件あります。
+    <a href="/teams/<%= team.id %>/tasks?assignee=none">確認する</a>
+  </p>
+<% } %>
+
+<h2>タスク別の見積と実績</h2>
+<% if (tasks.length === 0) { %>
+  <p>まだタスクがありません。</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>タスク</th>
+        <th>担当者</th>
+        <th>ステータス</th>
+        <th>見積</th>
+        <th>実績</th>
+        <th>差分</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% tasks.forEach((task) => { %>
+        <% const hasEstimate = task.estimated_minutes !== null; %>
+        <% const diff = hasEstimate ? task.actual_minutes - task.estimated_minutes : null; %>
+        <tr>
+          <td>
+            <a href="/teams/<%= team.id %>/tasks/<%= task.id %>"><%= task.title %></a>
+          </td>
+          <td><%= task.assignee_name ?? "未割り当て" %></td>
+          <td><%= statusLabel(task.status) %></td>
+          <td><%= hasEstimate ? formatMinutes(task.estimated_minutes) : "—" %></td>
+          <td><%= formatMinutes(task.actual_minutes) || "0分" %></td>
+          <td class="<%= diff !== null && diff > 0 ? "overdue" : "" %>">
+            <% if (diff === null) { %>
+              —
+            <% } else if (diff > 0) { %>
+              超過 <%= formatMinutes(diff) %>
+            <% } else if (diff < 0) { %>
+              残り <%= formatMinutes(-diff) %>
+            <% } else { %>
+              ぴったり
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+
+<p>
+  <a href="/teams/<%= team.id %>/tasks">タスク一覧</a> ／
+  <a href="/teams/<%= team.id %>">チームの画面</a>
+</p>
+
+<%- include("partials/footer") %>

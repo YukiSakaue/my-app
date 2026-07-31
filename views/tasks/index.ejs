@@ -81,6 +81,9 @@
   </table>
 <% } %>
 
-<p><a href="/teams/<%= team.id %>">チームの画面に戻る</a></p>
+<p>
+  <a href="/teams/<%= team.id %>/dashboard">ダッシュボード</a> ／
+  <a href="/teams/<%= team.id %>">チームの画面</a>
+</p>
 
 <%- include("../partials/footer") %>

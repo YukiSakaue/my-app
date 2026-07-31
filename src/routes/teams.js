@@ -4,6 +4,7 @@ import { AppError } from "../middleware/errors.js";
 import { requireAuth } from "../middleware/auth.js";
 import { loadTeam, requireLeader } from "../middleware/teams.js";
 import { tasksRouter } from "./tasks.js";
+import { dashboardRouter } from "./dashboard.js";
 import {
   ROLES,
   addMember,
@@ -130,7 +131,8 @@ teamScoped.post("/invite-code", requireLeader, async (req, res, next) => {
   }
 });
 
-// タスクはチーム配下。loadTeam を通った後なので所属は確認済み。
+// タスクとダッシュボードはチーム配下。loadTeam を通った後なので所属は確認済み。
 teamScoped.use("/tasks", tasksRouter);
+teamScoped.use("/dashboard", dashboardRouter);
 
 teamsRouter.use("/:teamId", teamScoped);

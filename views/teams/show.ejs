@@ -6,7 +6,10 @@
 
 <% const isLeader = team.role === "leader"; %>
 
-<p><a href="/teams/<%= team.id %>/tasks">タスク一覧を見る</a></p>
+<p>
+  <a href="/teams/<%= team.id %>/tasks">タスク一覧</a> ／
+  <a href="/teams/<%= team.id %>/dashboard">ダッシュボード</a>
+</p>
 
 <h2>メンバー（<%= members.length %>人）</h2>
 <table>
