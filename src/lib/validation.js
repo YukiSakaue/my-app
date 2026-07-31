@@ -48,6 +48,76 @@ export function validateLogin({ email, password }) {
   return { errors, values: { email: trimmedEmail } };
 }
 
+const MAX_TITLE_LENGTH = 200;
+const MAX_DESCRIPTION_LENGTH = 2000;
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * タスクの入力検証。
+ * 空文字は「未指定」として null に寄せ、DB には NULL を入れる。
+ */
+export function validateTask({ title, description, assigneeId, dueDate, estimatedMinutes }) {
+  const errors = [];
+  const trimmedTitle = String(title ?? "").trim();
+  const trimmedDescription = String(description ?? "").trim();
+
+  if (trimmedTitle.length === 0) {
+    errors.push("タイトルを入力してください");
+  } else if (trimmedTitle.length > MAX_TITLE_LENGTH) {
+    errors.push(`タイトルは${MAX_TITLE_LENGTH}文字以内で入力してください`);
+  }
+  if (trimmedDescription.length > MAX_DESCRIPTION_LENGTH) {
+    errors.push(`説明は${MAX_DESCRIPTION_LENGTH}文字以内で入力してください`);
+  }
+
+  const assigneeGiven = String(assigneeId ?? "").trim().length > 0;
+  const parsedAssigneeId = parseOptionalInteger(assigneeId);
+  if (assigneeGiven && parsedAssigneeId === null) {
+    errors.push("担当者の指定が不正です");
+  }
+
+  const parsedDueDate = String(dueDate ?? "").trim() || null;
+  if (parsedDueDate !== null && !isValidDate(parsedDueDate)) {
+    errors.push("期限は正しい日付で入力してください");
+  }
+
+  const parsedMinutes = parseOptionalInteger(estimatedMinutes);
+  const minutesGiven = String(estimatedMinutes ?? "").trim().length > 0;
+  if (minutesGiven && (parsedMinutes === null || parsedMinutes < 0)) {
+    errors.push("見積時間は0以上の整数（分）で入力してください");
+  }
+
+  return {
+    errors,
+    values: {
+      title: trimmedTitle,
+      description: trimmedDescription,
+      assigneeId: parsedAssigneeId,
+      dueDate: parsedDueDate,
+      estimatedMinutes: minutesGiven ? parsedMinutes : null,
+    },
+  };
+}
+
+/** 未入力なら null、整数として読めなければ null を返す。 */
+export function parseOptionalInteger(value) {
+  const text = String(value ?? "").trim();
+  if (text.length === 0) {
+    return null;
+  }
+  const parsed = Number(text);
+  return Number.isInteger(parsed) ? parsed : null;
+}
+
+// 'YYYY-MM-DD' の形に加えて、2月30日のような実在しない日付も弾く
+function isValidDate(text) {
+  if (!DATE_PATTERN.test(text)) {
+    return false;
+  }
+  const date = new Date(`${text}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(text);
+}
+
 /**
  * ログイン後の戻り先。外部サイトへ飛ばされないよう、
  * 自サイト内の絶対パスだけを許可する（"//example.com" は他サイト扱い）。

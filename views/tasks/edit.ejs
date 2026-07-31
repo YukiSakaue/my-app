@@ -1,0 +1,14 @@
+<%- include("../partials/header", { title: "タスクを編集" }) %>
+
+<h1>タスクを編集</h1>
+
+<%- include("../partials/errors", { errors }) %>
+
+<form action="/teams/<%= team.id %>/tasks/<%= task.id %>" method="post">
+  <%- include("_form", { values, members }) %>
+  <button type="submit">保存する</button>
+</form>
+
+<p><a href="/teams/<%= team.id %>/tasks/<%= task.id %>">タスクの詳細に戻る</a></p>
+
+<%- include("../partials/footer") %>

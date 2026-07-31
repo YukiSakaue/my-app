@@ -3,6 +3,7 @@ import { Router } from "express";
 import { AppError } from "../middleware/errors.js";
 import { requireAuth } from "../middleware/auth.js";
 import { loadTeam, requireLeader } from "../middleware/teams.js";
+import { tasksRouter } from "./tasks.js";
 import {
   ROLES,
   addMember,
@@ -128,5 +129,8 @@ teamScoped.post("/invite-code", requireLeader, async (req, res, next) => {
     next(err);
   }
 });
+
+// タスクはチーム配下。loadTeam を通った後なので所属は確認済み。
+teamScoped.use("/tasks", tasksRouter);
 
 teamsRouter.use("/:teamId", teamScoped);

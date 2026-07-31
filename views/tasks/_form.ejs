@@ -1,0 +1,29 @@
+<label>
+  タイトル
+  <input type="text" name="title" value="<%= values.title %>" required autofocus>
+</label>
+<label>
+  説明
+  <textarea name="description" rows="5"><%= values.description %></textarea>
+</label>
+<label>
+  担当者
+  <select name="assigneeId">
+    <option value="">未割り当て</option>
+    <% members.forEach((member) => { %>
+      <option value="<%= member.id %>"
+              <%= values.assigneeId === member.id ? "selected" : "" %>>
+        <%= member.name %>
+      </option>
+    <% }) %>
+  </select>
+</label>
+<label>
+  期限
+  <input type="date" name="dueDate" value="<%= values.dueDate ?? "" %>">
+</label>
+<label>
+  見積時間（分）
+  <input type="number" name="estimatedMinutes" min="0" step="1"
+         value="<%= values.estimatedMinutes ?? "" %>">
+</label>

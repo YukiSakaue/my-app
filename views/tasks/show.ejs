@@ -1,0 +1,79 @@
+<%- include("../partials/header", { title: task.title }) %>
+
+<% const isLeader = team.role === "leader"; %>
+<% const canChangeStatus = isLeader || task.assignee_id === currentUser.id; %>
+
+<h1><%= task.title %></h1>
+
+<%- include("../partials/errors", { errors }) %>
+
+<dl>
+  <dt>ステータス</dt>
+  <dd><%= statusLabel(task.status) %></dd>
+  <dt>担当者</dt>
+  <dd><%= task.assignee_name ?? "未割り当て" %></dd>
+  <dt>期限</dt>
+  <dd><%= formatDate(task.due_date) || "未設定" %></dd>
+  <dt>見積時間</dt>
+  <dd><%= formatMinutes(task.estimated_minutes) || "未設定" %></dd>
+  <dt>作成者</dt>
+  <dd><%= task.creator_name %>（<%= formatDateTime(task.created_at) %>）</dd>
+</dl>
+
+<% if (task.description) { %>
+  <h2>説明</h2>
+  <p class="description"><%= task.description %></p>
+<% } %>
+
+<% if (canChangeStatus) { %>
+  <h2>ステータスを変更する</h2>
+  <form action="/teams/<%= team.id %>/tasks/<%= task.id %>/status" method="post">
+    <select name="status">
+      <% statusOptions().forEach((option) => { %>
+        <option value="<%= option.value %>"
+                <%= task.status === option.value ? "selected" : "" %>>
+          <%= option.label %>
+        </option>
+      <% }) %>
+    </select>
+    <button type="submit">変更する</button>
+  </form>
+<% } %>
+
+<h2>ステータスの変更履歴</h2>
+<table>
+  <thead>
+    <tr>
+      <th>日時</th>
+      <th>変更</th>
+      <th>変更者</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% history.forEach((entry) => { %>
+      <tr>
+        <td><%= formatDateTime(entry.changed_at) %></td>
+        <td>
+          <% if (entry.from_status) { %>
+            <%= statusLabel(entry.from_status) %> → <%= statusLabel(entry.to_status) %>
+          <% } else { %>
+            作成（<%= statusLabel(entry.to_status) %>）
+          <% } %>
+        </td>
+        <td><%= entry.changed_by_name %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<% if (isLeader) { %>
+  <h2>操作</h2>
+  <p><a href="/teams/<%= team.id %>/tasks/<%= task.id %>/edit">編集する</a></p>
+  <form action="/teams/<%= team.id %>/tasks/<%= task.id %>/delete" method="post">
+    <button type="submit">このタスクを削除する</button>
+  </form>
+<% } %>
+
+<p><a href="/teams/<%= team.id %>/tasks">タスク一覧に戻る</a></p>
+
+<%- include("../partials/footer") %>

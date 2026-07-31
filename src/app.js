@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import express from "express";
 
 import { attachUser } from "./middleware/auth.js";
+import { formatDate, formatDateTime, formatMinutes, todayInJst } from "./lib/format.js";
+import { statusLabel, statusOptions } from "./lib/statuses.js";
 import { authRouter } from "./routes/auth.js";
 import { healthRouter } from "./routes/health.js";
 import { homeRouter } from "./routes/home.js";
@@ -17,6 +19,16 @@ export function createApp() {
   app.set("view engine", "ejs");
   // 起動時のカレントディレクトリに依存しないよう、このファイルからの相対で解決する
   app.set("views", fileURLToPath(new URL("../views", import.meta.url)));
+
+  // 表示用の整形はすべてのビューから使えるようにしておく
+  Object.assign(app.locals, {
+    formatDate,
+    formatDateTime,
+    formatMinutes,
+    todayInJst,
+    statusLabel,
+    statusOptions,
+  });
 
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
