@@ -1,0 +1,53 @@
+<%- include("../partials/header", { title: team.name }) %>
+
+<h1><%= team.name %></h1>
+
+<%- include("../partials/errors", { errors }) %>
+
+<% const isLeader = team.role === "leader"; %>
+
+<h2>メンバー（<%= members.length %>人）</h2>
+<table>
+  <thead>
+    <tr>
+      <th>名前</th>
+      <th>メールアドレス</th>
+      <th>権限</th>
+      <% if (isLeader) { %><th>権限の変更</th><% } %>
+    </tr>
+  </thead>
+  <tbody>
+    <% members.forEach((member) => { %>
+      <tr>
+        <td><%= member.name %></td>
+        <td><%= member.email %></td>
+        <td><%= member.role === "leader" ? "リーダー" : "メンバー" %></td>
+        <% if (isLeader) { %>
+          <td>
+            <form action="/teams/<%= team.id %>/members/<%= member.id %>/role" method="post">
+              <input type="hidden" name="role"
+                     value="<%= member.role === "leader" ? "member" : "leader" %>">
+              <button type="submit">
+                <%= member.role === "leader" ? "メンバーにする" : "リーダーにする" %>
+              </button>
+            </form>
+          </td>
+        <% } %>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<% if (isLeader) { %>
+  <h2>メンバーを招待する</h2>
+  <p>この招待コードを伝えてください。</p>
+  <p><code class="invite-code"><%= team.invite_code %></code></p>
+  <form action="/teams/<%= team.id %>/invite-code" method="post">
+    <button type="submit">招待コードを再発行する</button>
+  </form>
+  <p>再発行すると、それまでのコードは使えなくなります。</p>
+<% } %>
+
+<p><a href="/teams">チーム一覧に戻る</a></p>
+
+<%- include("../partials/footer") %>

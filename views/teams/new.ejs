@@ -1,0 +1,19 @@
+<%- include("../partials/header", { title: "チームを作る" }) %>
+
+<h1>チームを作る</h1>
+
+<%- include("../partials/errors", { errors }) %>
+
+<p>作成したあなたが、そのチームのリーダーになります。</p>
+
+<form action="/teams" method="post">
+  <label>
+    チーム名
+    <input type="text" name="name" value="<%= values.name %>" required autofocus>
+  </label>
+  <button type="submit">作成する</button>
+</form>
+
+<p><a href="/teams">チーム一覧に戻る</a></p>
+
+<%- include("../partials/footer") %>

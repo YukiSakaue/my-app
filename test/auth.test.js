@@ -170,14 +170,17 @@ describe("認証が必要なページ", () => {
     assert.equal(res.headers.location, "/login?returnTo=%2F");
   });
 
-  it("ログイン済みなら表示される", async () => {
+  it("ログイン済みならチーム一覧へ送られる", async () => {
     const agent = request.agent(app);
     await signup(agent);
 
     const res = await agent.get("/");
+    assert.equal(res.status, 302);
+    assert.equal(res.headers.location, "/teams");
 
-    assert.equal(res.status, 200);
-    assert.match(res.text, /田中太郎/);
+    const teams = await agent.get("/teams");
+    assert.equal(teams.status, 200);
+    assert.match(teams.text, /田中太郎/);
   });
 
   it("改竄された Cookie は未ログインとして扱う", async () => {

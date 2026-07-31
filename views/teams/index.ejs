@@ -1,0 +1,32 @@
+<%- include("../partials/header", { title: "チーム" }) %>
+
+<h1>チーム</h1>
+
+<%- include("../partials/errors", { errors }) %>
+
+<% if (teams.length === 0) { %>
+  <p>まだどのチームにも所属していません。チームを作るか、招待コードで参加してください。</p>
+<% } else { %>
+  <ul>
+    <% teams.forEach((team) => { %>
+      <li>
+        <a href="/teams/<%= team.id %>"><%= team.name %></a>
+        （<%= team.role === "leader" ? "リーダー" : "メンバー" %> ／
+        <%= team.member_count %>人）
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<p><a href="/teams/new">チームを作る</a></p>
+
+<h2>招待コードで参加する</h2>
+<form action="/teams/join" method="post">
+  <label>
+    招待コード
+    <input type="text" name="inviteCode" required>
+  </label>
+  <button type="submit">参加する</button>
+</form>
+
+<%- include("../partials/footer") %>
