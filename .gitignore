@@ -1,5 +1,5 @@
 node_modules/
+
+# 秘密情報を含むため commit しない。.env.example のみ commit する。
 .env
-
-
-/generated/prisma
+.env.test
