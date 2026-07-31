@@ -1,0 +1,13 @@
+<label>
+  日付
+  <input type="date" name="workDate" value="<%= values.workDate ?? "" %>" required>
+</label>
+<label>
+  作業時間（分）
+  <input type="number" name="minutes" min="1" step="1"
+         value="<%= values.minutes ?? "" %>" required>
+</label>
+<label>
+  メモ
+  <input type="text" name="note" value="<%= values.note ?? "" %>">
+</label>

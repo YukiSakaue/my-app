@@ -6,12 +6,13 @@ import { requireLeader } from "../middleware/teams.js";
 import { isValidStatus } from "../lib/statuses.js";
 import { validateTask } from "../lib/validation.js";
 import { listMembers } from "../models/teams.js";
+import { renderTaskDetail } from "./render-task.js";
+import { timeEntriesRouter } from "./time-entries.js";
 import {
   DEFAULT_SORT,
   changeStatus,
   createTask,
   isValidSort,
-  listStatusHistory,
   listTasks,
   softDeleteTask,
   updateTask,
@@ -92,12 +93,14 @@ tasksRouter.post("/", requireLeader, async (req, res, next) => {
 
 tasksRouter.get("/:taskId", loadTask, async (req, res, next) => {
   try {
-    const history = await listStatusHistory(req.task.id);
-    res.render("tasks/show", { history, errors: [] });
+    await renderTaskDetail(req, res);
   } catch (err) {
     next(err);
   }
 });
+
+// 作業時間はタスク配下。loadTask を通してから扱う。
+tasksRouter.use("/:taskId/time-entries", loadTask, timeEntriesRouter);
 
 tasksRouter.get("/:taskId/edit", loadTask, requireLeader, async (req, res, next) => {
   try {

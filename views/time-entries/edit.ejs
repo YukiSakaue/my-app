@@ -1,0 +1,17 @@
+<%- include("../partials/header", { title: "作業時間を編集" }) %>
+
+<h1>作業時間を編集</h1>
+
+<p><%= task.title %></p>
+
+<%- include("../partials/errors", { errors }) %>
+
+<form action="/teams/<%= team.id %>/tasks/<%= task.id %>/time-entries/<%= timeEntry.id %>"
+      method="post">
+  <%- include("_form", { values }) %>
+  <button type="submit">保存する</button>
+</form>
+
+<p><a href="/teams/<%= team.id %>/tasks/<%= task.id %>">タスクの詳細に戻る</a></p>
+
+<%- include("../partials/footer") %>

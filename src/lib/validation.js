@@ -99,6 +99,45 @@ export function validateTask({ title, description, assigneeId, dueDate, estimate
   };
 }
 
+const MAX_NOTE_LENGTH = 500;
+// 1日分の記録なので24時間を超える入力は打ち間違いとみなす
+const MAX_ENTRY_MINUTES = 24 * 60;
+
+/** 手入力の作業時間の検証。分は整数で受け取り、浮動小数は使わない。 */
+export function validateTimeEntry({ workDate, minutes, note }) {
+  const errors = [];
+  const trimmedDate = String(workDate ?? "").trim();
+  const trimmedNote = String(note ?? "").trim();
+
+  if (trimmedDate.length === 0) {
+    errors.push("日付を入力してください");
+  } else if (!isValidDate(trimmedDate)) {
+    errors.push("日付は正しい形式で入力してください");
+  }
+
+  const parsedMinutes = parseOptionalInteger(minutes);
+  if (parsedMinutes === null) {
+    errors.push("作業時間は整数（分）で入力してください");
+  } else if (parsedMinutes < 1) {
+    errors.push("作業時間は1分以上で入力してください");
+  } else if (parsedMinutes > MAX_ENTRY_MINUTES) {
+    errors.push(`作業時間は1日あたり${MAX_ENTRY_MINUTES}分以内で入力してください`);
+  }
+
+  if (trimmedNote.length > MAX_NOTE_LENGTH) {
+    errors.push(`メモは${MAX_NOTE_LENGTH}文字以内で入力してください`);
+  }
+
+  return {
+    errors,
+    values: {
+      workDate: trimmedDate,
+      minutes: parsedMinutes,
+      note: trimmedNote.length > 0 ? trimmedNote : null,
+    },
+  };
+}
+
 /** 未入力なら null、整数として読めなければ null を返す。 */
 export function parseOptionalInteger(value) {
   const text = String(value ?? "").trim();

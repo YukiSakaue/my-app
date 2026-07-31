@@ -6,6 +6,7 @@ import express from "express";
 import { attachUser } from "./middleware/auth.js";
 import { formatDate, formatDateTime, formatMinutes, todayInJst } from "./lib/format.js";
 import { statusLabel, statusOptions } from "./lib/statuses.js";
+import { attachRunningTimer } from "./middleware/time-entries.js";
 import { authRouter } from "./routes/auth.js";
 import { healthRouter } from "./routes/health.js";
 import { homeRouter } from "./routes/home.js";
@@ -38,6 +39,8 @@ export function createApp() {
 
   // 以降のすべてのルートで req.user / res.locals.currentUser が使えるようにする
   app.use(attachUser);
+  // 計測中のタスクはどの画面のヘッダーにも出すため、ここで拾っておく
+  app.use(attachRunningTimer);
 
   app.use(authRouter);
   app.use(homeRouter);

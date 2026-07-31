@@ -40,6 +40,76 @@
   </form>
 <% } %>
 
+<h2>作業時間</h2>
+
+<p class="total-time">
+  合計 <%= formatMinutes(totalMinutes) || "0分" %>
+  <% if (task.estimated_minutes !== null) { %>
+    ／ 見積 <%= formatMinutes(task.estimated_minutes) %>
+  <% } %>
+</p>
+
+<% const myRunningEntry = locals.runningTimer && runningTimer.task_id === task.id; %>
+<% if (myRunningEntry) { %>
+  <form action="/teams/<%= team.id %>/tasks/<%= task.id %>/time-entries/stop" method="post">
+    <button type="submit">計測を停止する</button>
+  </form>
+<% } else { %>
+  <form action="/teams/<%= team.id %>/tasks/<%= task.id %>/time-entries/start" method="post">
+    <button type="submit">計測を開始する</button>
+  </form>
+<% } %>
+
+<h3>手入力で記録する</h3>
+<form action="/teams/<%= team.id %>/tasks/<%= task.id %>/time-entries" method="post">
+  <%- include("../time-entries/_form", {
+        values: { workDate: todayInJst(), minutes: "", note: "" },
+      }) %>
+  <button type="submit">記録する</button>
+</form>
+
+<h3>作業ログ</h3>
+<% if (entries.length === 0) { %>
+  <p>まだ作業時間の記録はありません。</p>
+<% } else { %>
+  <table>
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th>担当</th>
+        <th>時間</th>
+        <th>メモ</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% entries.forEach((entry) => { %>
+        <tr>
+          <td><%= formatDate(entry.work_date) %></td>
+          <td><%= entry.user_name %></td>
+          <td>
+            <% if (entry.ended_at === null) { %>
+              計測中
+            <% } else { %>
+              <%= formatMinutes(entry.minutes) %>
+            <% } %>
+          </td>
+          <td><%= entry.note ?? "" %></td>
+          <td>
+            <% if (entry.user_id === currentUser.id && entry.ended_at !== null) { %>
+              <a href="/teams/<%= team.id %>/tasks/<%= task.id %>/time-entries/<%= entry.id %>/edit">編集</a>
+              <form action="/teams/<%= team.id %>/tasks/<%= task.id %>/time-entries/<%= entry.id %>/delete"
+                    method="post">
+                <button type="submit">削除</button>
+              </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+
 <h2>ステータスの変更履歴</h2>
 <table>
   <thead>
