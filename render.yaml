@@ -1,0 +1,26 @@
+# Render の Blueprint。ダッシュボードの Blueprints からこのリポジトリを指定すると、
+# ここに書いた設定で Web サービスが作られる。
+services:
+  - type: web
+    name: my-app
+    runtime: node
+    plan: free
+    # DB と同じリージョンに置く。別リージョンだと内部接続が使えない。
+    region: ohio
+    branch: main
+    buildCommand: npm ci
+    # マイグレーションは起動時に流す。node-pg-migrate がアドバイザリロックを
+    # 取るため、複数インスタンスが同時に起動しても二重適用にはならない。
+    startCommand: npm run migrate && npm start
+    # DB に到達できないと 503 を返すので、DB 断のままデプロイが完了しない
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # 起動のたびに変わると全員のログインが切れるため、Render に生成させて固定する
+      - key: JWT_SECRET
+        generateValue: true
+      # 既存の PostgreSQL の Internal Database URL をダッシュボードで設定する。
+      # sync: false は「値をリポジトリに書かず、ダッシュボードで入れる」の意味。
+      - key: DATABASE_URL
+        sync: false
