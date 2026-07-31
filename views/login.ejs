@@ -1,0 +1,22 @@
+<%- include("partials/header", { title: "ログイン" }) %>
+
+<h1>ログイン</h1>
+
+<%- include("partials/errors", { errors }) %>
+
+<form action="/login" method="post">
+  <input type="hidden" name="returnTo" value="<%= returnTo %>">
+  <label>
+    メールアドレス
+    <input type="email" name="email" value="<%= values.email %>" required autofocus>
+  </label>
+  <label>
+    パスワード
+    <input type="password" name="password" required>
+  </label>
+  <button type="submit">ログイン</button>
+</form>
+
+<p>アカウントをお持ちでない方は <a href="/signup">サインアップ</a></p>
+
+<%- include("partials/footer") %>

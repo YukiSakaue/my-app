@@ -1,0 +1,25 @@
+<%- include("partials/header", { title: "サインアップ" }) %>
+
+<h1>サインアップ</h1>
+
+<%- include("partials/errors", { errors }) %>
+
+<form action="/signup" method="post">
+  <label>
+    名前
+    <input type="text" name="name" value="<%= values.name %>" required autofocus>
+  </label>
+  <label>
+    メールアドレス
+    <input type="email" name="email" value="<%= values.email %>" required>
+  </label>
+  <label>
+    パスワード（8文字以上）
+    <input type="password" name="password" minlength="8" required>
+  </label>
+  <button type="submit">登録する</button>
+</form>
+
+<p>すでにアカウントをお持ちの方は <a href="/login">ログイン</a></p>
+
+<%- include("partials/footer") %>
